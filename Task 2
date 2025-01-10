@@ -1,0 +1,117 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+
+class FileEncryptor {
+private:
+    int shift; // Shift value for Caesar cipher
+
+    char encryptChar(char c) {
+        if (std::isalpha(c)) {
+            char base = std::islower(c) ? 'a' : 'A';
+            return (c - base + shift) % 26 + base;
+        }
+        return c;
+    }
+
+    char decryptChar(char c) {
+        if (std::isalpha(c)) {
+            char base = std::islower(c) ? 'a' : 'A';
+            return (c - base - shift + 26) % 26 + base;
+        }
+        return c;
+    }
+
+public:
+    FileEncryptor(int shiftValue) : shift(shiftValue) {}
+
+    void encryptFile(const std::string& inputFilePath, const std::string& outputFilePath) {
+        std::ifstream inputFile(inputFilePath);
+        std::ofstream outputFile(outputFilePath);
+
+        if (!inputFile.is_open() || !outputFile.is_open()) {
+            std::cerr << "Error: Unable to open file.\n";
+            return;
+        }
+
+        std::string line;
+        while (std::getline(inputFile, line)) {
+            for (char& c : line) {
+                c = encryptChar(c);
+            }
+            outputFile << line << '\n';
+        }
+
+        inputFile.close();
+        outputFile.close();
+        std::cout << "File encrypted successfully and saved to " << outputFilePath << "\n";
+    }
+
+    void decryptFile(const std::string& inputFilePath, const std::string& outputFilePath) {
+        std::ifstream inputFile(inputFilePath);
+        std::ofstream outputFile(outputFilePath);
+
+        if (!inputFile.is_open() || !outputFile.is_open()) {
+            std::cerr << "Error: Unable to open file.\n";
+            return;
+        }
+
+        std::string line;
+        while (std::getline(inputFile, line)) {
+            for (char& c : line) {
+                c = decryptChar(c);
+            }
+            outputFile << line << '\n';
+        }
+
+        inputFile.close();
+        outputFile.close();
+        std::cout << "File decrypted successfully and saved to " << outputFilePath << "\n";
+    }
+};
+
+int main() {
+    int choice, shiftValue;
+    std::string inputFilePath, outputFilePath;
+
+    std::cout << "Enter the shift value for the Caesar cipher: ";
+    std::cin >> shiftValue;
+    std::cin.ignore(); // To handle leftover newline character
+
+    FileEncryptor encryptor(shiftValue);
+
+    do {
+        std::cout << "\nFile Encryptor/Decryptor\n";
+        std::cout << "1. Encrypt a file\n";
+        std::cout << "2. Decrypt a file\n";
+        std::cout << "3. Exit\n";
+        std::cout << "Enter your choice: ";
+        std::cin >> choice;
+        std::cin.ignore(); // Handle newline character
+
+        switch (choice) {
+        case 1:
+            std::cout << "Enter the input file path: ";
+            std::getline(std::cin, inputFilePath);
+            std::cout << "Enter the output file path: ";
+            std::getline(std::cin, outputFilePath);
+            encryptor.encryptFile(inputFilePath, outputFilePath);
+            break;
+        case 2:
+            std::cout << "Enter the input file path: ";
+            std::getline(std::cin, inputFilePath);
+            std::cout << "Enter the output file path: ";
+            std::getline(std::cin, outputFilePath);
+            encryptor.decryptFile(inputFilePath, outputFilePath);
+            break;
+        case 3:
+            std::cout << "Exiting the application. Goodbye!\n";
+            break;
+        default:
+            std::cout << "Invalid choice. Please try again.\n";
+        }
+
+    } while (choice != 3);
+
+    return 0;
+}
